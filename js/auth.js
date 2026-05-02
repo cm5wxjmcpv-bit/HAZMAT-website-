@@ -1,0 +1,24 @@
+const Auth = (() => {
+  const sessionKey = 'hazmatSessionUserId';
+  function signup(email, password) {
+    const db = Storage.getDb();
+    if (db.users.some(u => u.email.toLowerCase() === email.toLowerCase())) throw new Error('Email already exists.');
+    const user = { id: crypto.randomUUID(), email, password, role: 'student', createdAt: new Date().toISOString(), paid: false, profileComplete: false };
+    db.users.push(user); Storage.saveDb(db); return user;
+  }
+  function login(email, password) {
+    const user = Storage.table('users').find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+    if (!user) throw new Error('Invalid credentials.');
+    localStorage.setItem(sessionKey, user.id);
+    return user;
+  }
+  function logout() { localStorage.removeItem(sessionKey); window.location.href = 'login.html'; }
+  function currentUser() { const id = localStorage.getItem(sessionKey); return Storage.table('users').find(u => u.id === id) || null; }
+  function requireAuth(role) {
+    const user = currentUser();
+    if (!user) { window.location.href = 'login.html'; return null; }
+    if (role && user.role !== role) { window.location.href = 'dashboard.html'; return null; }
+    return user;
+  }
+  return { signup, login, logout, currentUser, requireAuth };
+})();

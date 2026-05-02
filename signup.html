@@ -1,0 +1,6 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sign Up</title><link rel="stylesheet" href="css/styles.css"></head><body>
+<header><strong>Sign Up</strong><nav><a href="index.html">Home</a> | <a href="login.html">Login</a></nav></header>
+<main><div class="card"><h1>Create Account</h1><form id="signupForm" class="grid grid-2"><div><label>Email</label><input required type="email" id="email"></div><div><label>Password</label><input required type="password" id="password"></div><div style="grid-column:1/-1"><button>Create Account</button></div></form><p id="msg"></p></div></main>
+<script src="js/config.js"></script><script src="js/storage.js"></script><script src="js/auth.js"></script><script>
+document.getElementById('signupForm').addEventListener('submit',e=>{e.preventDefault();try{Auth.signup(email.value,password.value);msg.textContent='Account created. Please login.';setTimeout(()=>location.href='login.html',800);}catch(err){msg.textContent=err.message;msg.className='error';}});
+</script></body></html>
