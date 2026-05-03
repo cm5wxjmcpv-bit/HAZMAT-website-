@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Dashboard</title><link rel="stylesheet" href="css/styles.css"></head><body>
+<header><strong>Student Dashboard</strong><nav><a href="#" id="logoutLink">Logout</a></nav></header>
+<main id="app"></main>
+<script src="js/config.js"></script><script src="js/storage.js"></script><script src="js/auth.js"></script><script src="js/api.js"></script><script src="js/modules.js"></script><script>
+const user = Auth.requirePaidUser('student');
+if (user) {
+  logoutLink.onclick = e => { e.preventDefault(); Auth.logout(); };
+  const passed = !!Api.getLatestPassedAttempt(user.id);
+  const paidNotice = user.paid ? '<span class="success-text">Payment complete.</span>' : '<span class="error">Payment required before course access.</span>';
+  app.innerHTML = `<div class="card"><h1>Welcome, ${user.email}</h1><p>${paidNotice}</p><button id="payBtn" ${user.paid?'disabled':''}>Pay with Stripe (Placeholder)</button></div>
+  <div class="card"><h2>Modules</h2><div id="modulesList"></div></div>
+  <div class="card"><h2>Next Steps</h2><p><a id="testLink" href="test.html">Take Final Test</a></p><p><a id="certLink" href="certificate.html">View Certificate</a></p><p><a id="tprLink" href="tpr-status.html">View TPR Status</a></p></div>`;
+  payBtn.onclick = ()=>{ alert('Stripe checkout placeholder. Admin can mark paid in admin panel for testing.'); };
+
+  modulesList.innerHTML = MODULES.map(m=>{
+    const p=Api.getModuleProgress(user.id,m.id);
+    const complete=p?.completed;
+    const unlocked=user.paid && Modules.isModuleUnlocked(user.id,m.id);
+    return `<div class="module-row"><div><strong>Module ${m.id}:</strong> ${m.title}<br><small>${complete?'Completed':(unlocked?'Unlocked':'Locked')}</small></div><div><a href="${unlocked?'module.html?id='+m.id:'#'}">${complete?'Review':'Open'}</a></div></div>`;
+  }).join('');
+
+  const modulesDone = Modules.allModulesCompleted(user.id);
+  testLink.style.pointerEvents = (user.paid && modulesDone) ? 'auto' : 'none';
+  testLink.style.opacity = (user.paid && modulesDone) ? '1' : '0.5';
+  certLink.style.pointerEvents = passed ? 'auto' : 'none'; certLink.style.opacity = passed ? '1' : '0.5';
+  const tprExists = !!Api.getTprQueueRecord(user.id); tprLink.style.pointerEvents=tprExists?'auto':'none'; tprLink.style.opacity=tprExists?'1':'0.5';
+}
+</script></body></html>
