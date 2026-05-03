@@ -1,5 +1,6 @@
 const AdminPage = (() => {
   function render(container, adminUser) {
+    if (!adminUser || adminUser.role !== "admin") { container.innerHTML = `<div class="card">Access denied.</div>`; return; }
     const db = Storage.getDb();
     const students = db.users.filter(u => u.role === 'student');
 
@@ -25,6 +26,7 @@ const AdminPage = (() => {
       <div id="tprEditor"></div>`;
 
     container.querySelectorAll('[data-paid]').forEach(btn => btn.onclick = () => {
+      if (!adminUser || adminUser.role !== 'admin') return;
       const user = db.users.find(x => x.id === btn.dataset.paid); user.paid = !user.paid; Storage.saveDb(db); render(container, adminUser);
     });
     container.querySelectorAll('[data-edit-tpr]').forEach(btn => btn.onclick = () => openTprEditor(container, btn.dataset.editTpr, adminUser));
@@ -43,6 +45,7 @@ const AdminPage = (() => {
     document.getElementById('tprRejection').value = tpr.rejectionReason || '';
     document.getElementById('tprConfirmation').value = tpr.tprConfirmation || '';
     document.getElementById('saveTprBtn').onclick = () => {
+      if (!adminUser || adminUser.role !== 'admin') return;
       tpr.status = document.getElementById('tprStatus').value;
       tpr.rejectionReason = document.getElementById('tprRejection').value.trim();
       tpr.tprConfirmation = document.getElementById('tprConfirmation').value.trim();

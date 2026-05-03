@@ -1,3 +1,4 @@
+// Firebase migration: replace localStorage database with Firestore adapter and server-side validation.
 const Storage = (() => {
   const emptyDb = () => ({ users: [], studentProfiles: [], progress: [], testAttempts: [], certificates: [], tprQueue: [] });
 
