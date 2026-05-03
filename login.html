@@ -1,0 +1,6 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Login</title><link rel="stylesheet" href="css/styles.css"></head><body>
+<header><strong>Login</strong><nav><a href="index.html">Home</a> | <a href="signup.html">Sign Up</a></nav></header>
+<main><div class="card"><h1>Login</h1><form id="loginForm" class="grid grid-2"><div><label>Email</label><input required type="email" id="email"></div><div><label>Password</label><input required type="password" id="password"></div><div style="grid-column:1/-1"><button>Login</button></div></form><p class="muted">Admin seed: admin@hazmat.local / admin123</p><p id="msg"></p></div></main>
+<script src="js/config.js"></script><script src="js/storage.js"></script><script src="js/auth.js"></script><script>
+document.getElementById('loginForm').addEventListener('submit',e=>{e.preventDefault();try{const u=Auth.login(email.value,password.value);location.href=u.role==='admin'?'admin.html':'dashboard.html';}catch(err){msg.textContent=err.message;msg.className='error';}});
+</script></body></html>
