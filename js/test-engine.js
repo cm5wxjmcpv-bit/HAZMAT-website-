@@ -11,6 +11,7 @@ const TestEngine = (() => {
   function render(container, userId) {
     const selected = new Map();
     const randomized = shuffle(questions);
+    const attemptStartedAt = new Date().toISOString();
     container.innerHTML = '<h2>Final Test</h2>' + randomized.map((q, idx) => `
       <div class="card"><p><strong>${idx + 1}. ${q.question}</strong></p>
       ${q.choices.map((c, ci) => `<label><input type="radio" name="q_${q.id}" value="${ci}"> ${c}</label>`).join('')}</div>
@@ -19,7 +20,7 @@ const TestEngine = (() => {
     container.querySelectorAll('input[type="radio"]').forEach(i => i.addEventListener('change', e => selected.set(Number(e.target.name.split('_')[1]), Number(e.target.value))));
 
     document.getElementById('submitTestBtn').addEventListener('click', () => {
-      const startedAt = new Date().toISOString();
+      const startedAt = attemptStartedAt;
       let correct = 0;
       const answers = randomized.map(q => ({ questionId: q.id, selected: selected.get(q.id) ?? null, correct: q.answer }));
       answers.forEach(a => { if (a.selected === a.correct) correct++; });

@@ -32,10 +32,18 @@ const VideoTracker = (() => {
       if (video.currentTime > maxSecondReached + 1.5) video.currentTime = maxSecondReached;
     });
 
+    let lastTick = Date.now();
     const ticker = setInterval(() => {
-      if (!video.paused && !video.ended) {
-        watchedSeconds = Math.max(watchedSeconds, Math.floor(video.currentTime));
+      const now = Date.now();
+      const elapsed = Math.floor((now - lastTick) / 1000);
+      lastTick = now;
+      if (!video.paused && !video.ended && elapsed > 0) {
+        const allowedRate = video.playbackRate <= 1.25;
+        const currentSecond = Math.floor(video.currentTime);
         maxSecondReached = Math.max(maxSecondReached, video.currentTime);
+        if (allowedRate && currentSecond <= Math.floor(maxSecondReached) + 1) {
+          watchedSeconds = Math.min(requiredSeconds, watchedSeconds + elapsed);
+        }
         persist();
       }
     }, 1000);

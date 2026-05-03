@@ -6,9 +6,11 @@ const Api = (() => {
 
   const getModuleProgress = (userId, moduleId) => Storage.table('progress').find(p => p.userId === userId && p.moduleId === moduleId) || null;
   const saveModuleProgress = progress => {
-    const key = `${progress.userId}_${progress.moduleId}`;
-    progress._key = key;
-    return Storage.upsert('progress', progress, '_key');
+    const db = Storage.getDb();
+    const idx = db.progress.findIndex(p => p.userId === progress.userId && p.moduleId === progress.moduleId);
+    if (idx >= 0) db.progress[idx] = progress; else db.progress.push(progress);
+    Storage.saveDb(db);
+    return progress;
   };
 
   const getAllProgressForUser = userId => Storage.table('progress').filter(p => p.userId === userId);

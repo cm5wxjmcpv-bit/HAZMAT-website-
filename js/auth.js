@@ -4,7 +4,18 @@ const Auth = (() => {
     const db = Storage.getDb();
     if (db.users.some(u => u.email.toLowerCase() === email.toLowerCase())) throw new Error('Email already exists.');
     const user = { id: crypto.randomUUID(), email, password, role: 'student', createdAt: new Date().toISOString(), paid: false, profileComplete: false };
-    db.users.push(user); Storage.saveDb(db); return user;
+    db.users.push(user);
+    db.studentProfiles.push({
+      userId: user.id,
+      firstName: '', middleName: '', lastName: '', suffix: '',
+      dateOfBirth: '', phone: '', address: '', city: '', state: '', zip: '',
+      cdlOrClpNumber: '', licenseState: '',
+      licenseUploadPlaceholder: '',
+      consentToSubmitTPR: true,
+      nameCertification: true
+    });
+    Storage.saveDb(db);
+    return user;
   }
   function login(email, password) {
     const user = Storage.table('users').find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
@@ -17,7 +28,10 @@ const Auth = (() => {
   function requireAuth(role) {
     const user = currentUser();
     if (!user) { window.location.href = 'login.html'; return null; }
-    if (role && user.role !== role) { window.location.href = 'dashboard.html'; return null; }
+    if (role && user.role !== role) {
+      window.location.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+      return null;
+    }
     return user;
   }
   return { signup, login, logout, currentUser, requireAuth };
